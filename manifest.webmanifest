@@ -1,0 +1,15 @@
+{
+  "name": "Lexicon — mots rares",
+  "short_name": "Lexicon",
+  "description": "Découvrez et maîtrisez des mots rares et savants de la langue française.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1f1b3a",
+  "theme_color": "#1f1b3a",
+  "lang": "fr",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f1b3a">
+  <meta name="description" content="Découvrez et maîtrisez des mots rares et savants de la langue française.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Lexicon — mots rares</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app" aria-live="polite"></main>
+  <nav class="tabbar" aria-label="Navigation principale">
+    <button data-nav="home" class="tab"><span class="tab-ico">⌂</span><span>Accueil</span></button>
+    <button data-nav="discover" class="tab"><span class="tab-ico">✦</span><span>Découverte</span></button>
+    <button data-nav="quiz" class="tab"><span class="tab-ico">?</span><span>Quiz</span></button>
+    <button data-nav="lexicon" class="tab"><span class="tab-ico">≡</span><span>Lexique</span></button>
+  </nav>
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
