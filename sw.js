@@ -1,5 +1,5 @@
 // Service worker : met l'application en cache pour un usage hors ligne.
-const CACHE = "lexicon-v1";
+const CACHE = "lexicon-v2";
 const ASSETS = ["./", "index.html", "styles.css", "app.js", "words.js", "manifest.webmanifest", "icons/icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -16,7 +16,7 @@ self.addEventListener("activate", (event) => {
 
 // Réseau d'abord (pour recevoir les mises à jour), cache en secours.
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+  if (event.request.method !== "GET" || new URL(event.request.url).pathname.includes("/api/")) return;
   event.respondWith(
     fetch(event.request)
       .then((res) => {

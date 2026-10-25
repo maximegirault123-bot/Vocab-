@@ -109,12 +109,19 @@
       <p class="definition">${esc(w.definition)}</p>
       <div class="usage-label">Pour l'employer</div>
       ${w.examples.map((e) => `<p class="example">${exampleHtml(e)}</p>`).join("")}
-      ${w.etymology ? `<p class="etym">${esc(w.etymology)}</p>` : ""}`;
+      ${w.etymology ? `<p class="etym">${esc(w.etymology)}</p>` : ""}
+      ${
+        p.sentences && p.sentences.length
+          ? `<div class="usage-label">Tes phrases</div>
+             ${p.sentences.map((t) => `<p class="example mine">${esc(t)}</p>`).join("")}`
+          : ""
+      }
+      <button class="btn write-btn" data-write="${esc(w.word)}">✍️ Écrire ma phrase avec ce mot</button>`;
   }
 
   // ---------- Navigation ----------
 
-  const views = { home: renderHome, discover: renderDiscover, quiz: renderQuiz, lexicon: renderLexicon };
+  const views = { home: renderHome, discover: renderDiscover, quiz: renderQuiz, write: renderWrite, lexicon: renderLexicon };
 
   function route() {
     const name = (location.hash || "#home").slice(1);
@@ -137,6 +144,11 @@
     if (sp) {
       e.stopPropagation();
       speak(sp.dataset.speak);
+    }
+    const wr = e.target.closest("[data-write]");
+    if (wr) {
+      e.stopPropagation();
+      startWriting(WORDS.find((w) => w.word === wr.dataset.write));
     }
   });
 
@@ -186,6 +198,10 @@
           <span class="ico">?</span>
           <span><h3>Quiz</h3><p>Vérifiez que les mots sont bien assimilés.</p></span>
         </button>
+        <button class="mode-card" data-nav="write">
+          <span class="ico">✎</span>
+          <span><h3>Écrire</h3><p>Employez le mot dans votre propre phrase, corrigée par l'IA.</p></span>
+        </button>
         <button class="mode-card" data-nav="lexicon">
           <span class="ico">≡</span>
           <span><h3>Lexique</h3><p>Parcourez tous les mots et votre progression.</p></span>
@@ -195,7 +211,7 @@
       </div>`;
 
     app.querySelector("[data-open]").addEventListener("click", (e) => {
-      if (e.target.closest("[data-speak]")) return;
+      if (e.target.closest("[data-speak], [data-write]")) return;
       prog(wotd.word).seen = true;
       save();
       openModal(wotd);
@@ -287,7 +303,7 @@
     const flip = document.getElementById("flip");
     if (flip) {
       flip.addEventListener("click", (e) => {
-        if (e.target.closest("[data-speak]")) return;
+        if (e.target.closest("[data-speak], [data-write]")) return;
         discover.revealed = true;
         renderDiscover();
       });
@@ -571,6 +587,133 @@
     });
     const retry = document.getElementById("retry-missed");
     if (retry) retry.addEventListener("click", () => startQuiz(shuffle(missed)));
+  }
+
+  // ---------- Mode Écrire : phrase corrigée par l'IA ----------
+
+  const MAX_SAVED_SENTENCES = 5;
+  const write = { word: null, text: "", loading: false, result: null, error: null };
+
+  // Priorité aux mots découverts que le joueur n'a encore jamais employés lui-même.
+  function pickWordToWrite() {
+    const seen = WORDS.filter(isSeen);
+    const pool = seen.length ? seen : WORDS;
+    const used = (w) => (peek(w.word).sentences || []).length;
+    const fewest = Math.min(...pool.map(used));
+    return shuffle(pool.filter((w) => used(w) === fewest))[0];
+  }
+
+  function startWriting(w) {
+    Object.assign(write, { word: w || pickWordToWrite(), text: "", loading: false, result: null, error: null });
+    go("write");
+  }
+
+  function renderWrite() {
+    if (!write.word) write.word = pickWordToWrite();
+    const w = write.word;
+    const r = write.result;
+    const verdicts = {
+      correct: ["ok", "✅ Bien employé !"],
+      approximatif: ["meh", "🟡 Presque…"],
+      incorrect: ["ko", "❌ Pas tout à fait"],
+    };
+
+    let result = "";
+    if (write.error) {
+      result = `<div class="feedback ko fade-in">${esc(write.error)}</div>`;
+    } else if (r) {
+      const [cls, title] = verdicts[r.verdict];
+      result = `
+        <div class="feedback ${cls} fade-in">
+          <b>${title}</b>
+          <div style="margin-top:6px">${esc(r.feedback)}</div>
+          ${r.suggestion ? `<div class="suggestion"><span class="small muted">Proposition :</span><br><i>${esc(r.suggestion)}</i></div>` : ""}
+        </div>`;
+    }
+
+    app.innerHTML = `
+      <div class="fade-in">
+        <h2>Écrire</h2>
+        <p class="muted small" style="margin-top:-6px">Employer un mot soi-même, c'est le meilleur moyen de le faire passer dans son vocabulaire actif.</p>
+        <div class="card">
+          <div class="word-head">
+            <div>
+              <div class="word">${esc(w.word)}</div>
+              <div class="wtype">${esc(w.type)}</div>
+            </div>
+            <button class="speak" data-speak="${esc(w.word)}" aria-label="Écouter">🔊</button>
+          </div>
+          <p class="definition">${esc(w.definition)}</p>
+          <details class="hint">
+            <summary>Besoin d'inspiration ?</summary>
+            ${w.examples.map((e) => `<p class="example">${exampleHtml(e)}</p>`).join("")}
+          </details>
+        </div>
+
+        <textarea id="sentence" class="sentence" maxlength="400" rows="3"
+          placeholder="Écris une phrase de ton quotidien avec « ${esc(w.word.toLowerCase())} »…"
+          ${write.loading ? "disabled" : ""}>${esc(write.text)}</textarea>
+
+        ${
+          r && r.verdict === "correct"
+            ? `<div class="btn-row"><button class="btn" id="next-word">Mot suivant</button></div>`
+            : `<div class="btn-row">
+                 <button class="btn secondary" id="other-word" ${write.loading ? "disabled" : ""}>Autre mot</button>
+                 <button class="btn" id="submit" ${write.loading ? "disabled" : ""}>${write.loading ? "Correction…" : r ? "Réessayer" : "Faire corriger"}</button>
+               </div>`
+        }
+        ${result}
+      </div>`;
+
+    const area = document.getElementById("sentence");
+    area.addEventListener("input", () => (write.text = area.value));
+    const submit = document.getElementById("submit");
+    if (submit) submit.addEventListener("click", submitSentence);
+    const other = document.getElementById("other-word");
+    if (other) other.addEventListener("click", () => startWriting());
+    const next = document.getElementById("next-word");
+    if (next) next.addEventListener("click", () => startWriting());
+  }
+
+  async function submitSentence() {
+    const text = write.text.trim();
+    if (!text) {
+      write.error = "Écris d'abord une phrase.";
+      write.result = null;
+      return renderWrite();
+    }
+    Object.assign(write, { loading: true, error: null, result: null });
+    renderWrite();
+    const w = write.word;
+    try {
+      const res = await fetch("api/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: w.word, sentence: text }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || data.error) {
+        throw new Error(
+          (data && data.error) ||
+            ([404, 405, 501].includes(res.status)
+              ? "La correction par l'IA n'est pas disponible sur cette version de l'appli (voir le README)."
+              : "La correction n'a pas abouti, réessaie.")
+        );
+      }
+      write.result = data;
+      if (data.verdict === "correct") {
+        const p = prog(w.word);
+        p.seen = true;
+        p.level = Math.min(MAX_LEVEL, p.level + 1);
+        p.sentences = (p.sentences || []).concat(text).slice(-MAX_SAVED_SENTENCES);
+        state.sentencesWritten = (state.sentencesWritten || 0) + 1;
+        save();
+      }
+    } catch (err) {
+      write.error = navigator.onLine === false ? "Pas de connexion : la correction nécessite internet." : err.message;
+    }
+    write.loading = false;
+    if (write.word === w && location.hash === "#write") renderWrite();
   }
 
   // ---------- Lexique ----------

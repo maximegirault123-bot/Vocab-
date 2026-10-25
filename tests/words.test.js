@@ -1,10 +1,9 @@
 // Vérifie la cohérence du lexique : node tests/words.test.js
-const assert = require("assert");
-const fs = require("fs");
-const path = require("path");
+import assert from "node:assert";
+import fs from "node:fs";
 
 const window = {};
-new Function("window", fs.readFileSync(path.join(__dirname, "..", "words.js"), "utf8"))(window);
+new Function("window", fs.readFileSync(new URL("../words.js", import.meta.url), "utf8"))(window);
 const words = window.WORDS;
 
 assert(words.length >= 20, "le lexique doit contenir au moins 20 mots");
