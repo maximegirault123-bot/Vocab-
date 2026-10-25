@@ -107,7 +107,8 @@
         ${p.level >= MAX_LEVEL ? '<span class="tag mastered">Maîtrisé</span>' : ""}
       </div>
       <p class="definition">${esc(w.definition)}</p>
-      <p class="example">${exampleHtml(w.example)}</p>
+      <div class="usage-label">Pour l'employer</div>
+      ${w.examples.map((e) => `<p class="example">${exampleHtml(e)}</p>`).join("")}
       ${w.etymology ? `<p class="etym">${esc(w.etymology)}</p>` : ""}`;
   }
 
@@ -339,7 +340,8 @@
       if (sameType.length >= 3) others = sameType;
     }
     const options = shuffle([w].concat(sample(others, 3)));
-    return { w, type, options, answered: null };
+    const sentence = shuffle(w.examples)[0];
+    return { w, type, options, sentence, answered: null };
   }
 
   function startQuiz(words) {
@@ -435,7 +437,7 @@
       serif = true;
     } else {
       prompt = `<div class="prompt-label">Complétez la phrase</div>
-                <div class="prompt-text">${exampleWithBlank(q.w.example)}</div>`;
+                <div class="prompt-text">${exampleWithBlank(q.sentence)}</div>`;
       optionLabel = (o) => esc(o.word);
       serif = true;
     }
@@ -459,7 +461,7 @@
         <div class="feedback ${ok ? "ok" : "ko"} fade-in">
           ${ok ? "✅ Bonne réponse !" : "❌ Raté…"}
           <div style="margin-top:6px"><b>${esc(q.w.word)}</b> : ${esc(q.w.definition)}</div>
-          <div class="small muted" style="margin-top:6px"><i>${exampleHtml(q.w.example)}</i></div>
+          ${q.w.examples.map((e) => `<div class="small muted" style="margin-top:6px"><i>${exampleHtml(e)}</i></div>`).join("")}
         </div>
         <button class="btn" id="next" style="margin-top:14px">${quiz.index + 1 < total ? "Question suivante" : "Voir le résultat"}</button>`;
     }

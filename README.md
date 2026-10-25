@@ -26,10 +26,10 @@ L'application fonctionne ensuite hors ligne.
 
 ## Ajouter des mots
 
-Ajouter une entrée dans `words.js`, en entourant le mot de `**` dans l'exemple (cela sert aux phrases à trous) :
+Ajouter une entrée dans `words.js`, avec une ou deux phrases tirées de situations courantes, en y entourant le mot de `**` (cela sert aux phrases à trous) :
 
 ```js
-{ word: "Abscons", type: "adj.", level: 1, definition: "…", example: "Son exposé **abscons**…", etymology: "…" },
+{ word: "Abscons", type: "adj.", level: 1, definition: "…", examples: ["Le mail de la direction était **abscons**…", "Évite le jargon **abscons**…"], etymology: "…" },
 ```
 
 Puis vérifier le lexique avec `node tests/words.test.js`.

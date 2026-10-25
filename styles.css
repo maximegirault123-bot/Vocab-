@@ -146,6 +146,8 @@ h2 { font-size: 1.4rem; margin-bottom: 12px; }
 .tag { font-size: 0.72rem; padding: 3px 9px; border-radius: 99px; background: #ece5d3; color: var(--ink-soft); }
 .tag.mastered { background: #d6f2e4; color: #1d7a50; }
 .definition { font-size: 1.12rem; line-height: 1.45; margin: 18px 0 0; }
+.usage-label { margin-top: 18px; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.usage-label + .example { margin-top: 8px; }
 .example { font-family: var(--serif); font-style: italic; line-height: 1.5; margin: 14px 0 0; padding-left: 12px; border-left: 3px solid var(--gold); color: #3a3558; }
 .example mark { background: none; color: var(--ink); font-weight: 700; }
 .etym { font-size: 0.85rem; color: var(--ink-soft); margin: 14px 0 0; }

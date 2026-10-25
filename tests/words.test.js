@@ -10,9 +10,10 @@ const words = window.WORDS;
 assert(words.length >= 20, "le lexique doit contenir au moins 20 mots");
 const seen = new Set();
 for (const w of words) {
-  for (const k of ["word", "type", "definition", "example"]) assert(w[k], `${w.word}: champ « ${k} » manquant`);
+  for (const k of ["word", "type", "definition"]) assert(w[k], `${w.word}: champ « ${k} » manquant`);
   assert([1, 2, 3].includes(w.level), `${w.word}: niveau invalide`);
-  assert(/\*\*.+?\*\*/.test(w.example), `${w.word}: l'exemple doit marquer le mot avec **`);
+  assert(Array.isArray(w.examples) && w.examples.length >= 1 && w.examples.length <= 2, `${w.word}: une ou deux phrases attendues`);
+  for (const e of w.examples) assert(/\*\*.+?\*\*/.test(e), `${w.word}: chaque phrase doit marquer le mot avec **`);
   assert(!seen.has(w.word.toLowerCase()), `${w.word}: doublon`);
   seen.add(w.word.toLowerCase());
 }
