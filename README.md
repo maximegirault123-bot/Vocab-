@@ -7,7 +7,7 @@ Application mobile (PWA) pour découvrir et maîtriser des mots français rares,
 - **Découverte** : une carte par mot. On devine le sens, on touche pour révéler la définition, un exemple et l'étymologie, puis on indique si le mot était connu. Filtres : *Nouveaux*, *À consolider*, *Tous*.
 - **Quiz** : 5, 10 ou 20 questions de trois types (trouver la définition, retrouver le mot, compléter une phrase). Une bonne réponse fait monter la maîtrise du mot (●●● = maîtrisé), une erreur la fait baisser. Les séries de bonnes réponses rapportent des points bonus. On peut interroger les mots découverts, tous les mots ou seulement ses erreurs.
 - **Écrire** : l'utilisateur écrit sa propre phrase avec un mot, et Claude (l'IA d'Anthropic) lui dit si le mot est bien employé, explique pourquoi et propose une correction. Une phrase réussie fait progresser la maîtrise du mot et s'affiche ensuite sur sa fiche (« Tes phrases »).
-- **Lexique** : liste des 80 mots avec recherche, filtres et niveau de maîtrise.
+- **Lexique** : liste des 330 mots avec recherche, filtres et niveau de maîtrise.
 
 Également : un mot du jour, la prononciation (synthèse vocale), et une progression sauvegardée sur l'appareil.
 
